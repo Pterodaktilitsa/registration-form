@@ -1,12 +1,7 @@
 import { useState } from 'react';
 import './App.css';
 
-function App() {
-	// В поле для пароля не должно быть больше 8 символов +
-	// Ограничение по некоторым символам (!, какая-то дичь) +
-
-	// При нажатии на кнопку Войти, если данные неверны (пароль > 8 символов или пароль содержит невалидные символы) -> под инпутом появляется надпись
-
+export const App = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
@@ -83,6 +78,4 @@ function App() {
 			</form>
 		</div>
 	);
-}
-
-export default App;
+};
