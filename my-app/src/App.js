@@ -1,43 +1,34 @@
-import { useState } from 'react';
 import './App.css';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+const loginChangeScheme = yup.object().shape({
+	email: yup
+		.string()
+		.matches(
+			/!^[\w_]*$/,
+			'Неверный логин. Допустимые символы - буквы, цифры и нижнее подчеркивание',
+		)
+		.max(20, 'Неверный логин. Должно быть не больше 20 символов')
+		.required('Обязательное поле'),
+	password: yup
+		.string()
+		.matches(/!^[\w_]*$/, 'Неверный пароль. Допускается только ввод букв.')
+		.max(8, 'Неверный пароль. Допускается не больше 8 символов.')
+		.required('Обязательное поле'),
+	confirmPassword: yup
+		.string()
+		.matches(/!^[\w_]*$/, 'Неверный пароль. Допускается только ввод букв.')
+		.max(8, 'Неверный пароль. Допускается не больше 8 символов.')
+		.required('Обязательное поле')
+		.oneOf([yup.ref('password')], 'Пароли не совпадают'),
+});
 
 export const App = () => {
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
-
-	const onEmailChange = ({ target }) => {
-		setEmail(target.value);
-	};
-
-	const onPasswordChange = ({ target }) => {
-		setPassword(target.value);
-	};
-
-	const onConfirmPasswordChange = ({ target }) => {
-		setConfirmPassword(target.value);
-	};
-
-	let newError = null;
-	let newErrorForConfirm = null;
-
-	const stringForValidation = '!_*@$?<>{}()';
-
-	for (const symbol of stringForValidation) {
-		if (password.includes(symbol)) {
-			newError = 'Неверный пароль. Допускается только ввод букв.';
-		} else if (password.length > 8) {
-			newError = 'Неверный пароль. Допускается не больше 8 символов.';
-		}
-
-		if (confirmPassword.includes(symbol)) {
-			newErrorForConfirm = 'Неверный пароль. Допускается только ввод букв.';
-		} else if (confirmPassword.length > 8) {
-			newErrorForConfirm = 'Неверный пароль. Допускается не больше 8 символов.';
-		}
-	}
-
-	const disabledCheck = newError === null && newErrorForConfirm === null ? false : true;
+	const { register, handleSubmit, errors } = useForm({
+		resolver: yupResolver(loginChangeScheme),
+	});
 
 	return (
 		<div className="App">
@@ -47,34 +38,35 @@ export const App = () => {
 					<input
 						type="text"
 						placeholder="Обязательное поле"
-						value={email}
-						onChange={onEmailChange}
+						name="email"
+						ref={handleSubmit}
 					/>
 				</label>
+				{errors.email && <span>{errors.email.message}</span>}
 
 				<label>
 					Пароль
 					<input
 						type="password"
 						placeholder="Обязательное поле"
-						value={password}
-						onChange={onPasswordChange}
+						name="password"
+						ref={register}
 					/>
-					<span>{newError}</span>
 				</label>
+				{errors.password && <span>{errors.password.message}</span>}
 
 				<label>
 					Повтор пароля
 					<input
 						type="password"
 						placeholder="Обязательное поле"
-						value={confirmPassword}
-						onChange={onConfirmPasswordChange}
+						name="confirmPassword"
+						ref={register}
 					/>
-					<span>{newErrorForConfirm}</span>
 				</label>
+				{errors.confirmPassword && <span>{errors.confirmPassword.message}</span>}
 
-				<button disabled={disabledCheck}>Войти</button>
+				<button type="submit">Войти</button>
 			</form>
 		</div>
 	);
